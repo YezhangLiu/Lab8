@@ -182,7 +182,7 @@ describe('Basic user flow for SPA ', () => {
   });
 
   // create your own test 20
-  it('test20: test back then forward', async () => {
+  it('test20: test entry 5 title', async () => {
     const entrypage = await page.$('entry-page');
     const entry5 = await entrypage.getProperty('entry');
     const data = await entry5.jsonValue();
