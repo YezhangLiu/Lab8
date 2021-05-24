@@ -29,12 +29,19 @@ describe('Basic user flow for SPA ', () => {
 
   it('Test3: Clicking first <journal-entry>, new URL should contain /#entry1', async () => {
     // implement test3: Clicking on the first journal entry should update the URL to contain “/#entry1”
-
+    const entries = await page.$$('journal-entry');
+    await entries[0].click();
+    await page.waitForNavigation();
+    const pageUrl = await page.url();
+    expect(pageUrl).toBe('http://127.0.0.1:5500/#entry1');
   });
 
   it('Test4: On first Entry page - checking page header title', async () => {
     // implement test4: Clicking on the first journal entry should update the header text to “Entry 1” 
-
+    const entry1Header = await page.$eval('header > h1', (header) => {
+      return header.innerHTML;
+    });
+    expect(entry1Header).toBe("Entry 1");
   });
 
   it('Test5: On first Entry page - checking <entry-page> contents', async () => {
@@ -50,58 +57,136 @@ describe('Basic user flow for SPA ', () => {
           }
         }
       */
-
+     const entrypage = await page.$('entry-page');
+     const entry1 = await entrypage.getProperty('entry');
+     const data = await entry1.jsonValue();
+     expect(data.title).toBe('You like jazz?');
+     expect(data.date).toBe('4/25/2021');
+     expect(data.content).toBe("According to all known laws of aviation, there is no way a bee should be able to fly. Its wings are too small to get its fat little body off the ground. The bee, of course, flies anyway because bees don't care what humans think is impossible.");
+     expect(data.image.src).toBe('https://i1.wp.com/www.thepopcornmuncher.com/wp-content/uploads/2016/11/bee-movie.jpg?resize=800%2C455');
+     expect(data.image.alt).toBe('bee with sunglasses');
   }, 10000);
 
   it('Test6: On first Entry page - checking <body> element classes', async () => {
     // implement test6: Clicking on the first journal entry should update the class attribute of <body> to ‘single-entry’
-
+    const classAttribute = await page.$eval('body', (body)=>{
+      return body.classList[0];
+    });
+    expect(classAttribute).toBe('single-entry');
   });
 
   it('Test7: Clicking the settings icon, new URL should contain #settings', async () => {
     // implement test7: Clicking on the settings icon should update the URL to contain “/#settings”
-
+    await page.click('header > img');
+    expect(page.url()).toBe('http://127.0.0.1:5500/#settings');
   });
 
   it('Test8: On Settings page - checking page header title', async () => {
     // implement test8: Clicking on the settings icon should update the header to be “Settings”
-
+    const settingHeader = await page.$eval('header > h1', (header) => {
+      return header.innerHTML;
+    });
+    expect(settingHeader).toBe("Settings");
   });
 
   it('Test9: On Settings page - checking <body> element classes', async () => {
     // implement test9: Clicking on the settings icon should update the class attribute of <body> to ‘settings’
-
+    const classAttribute = await page.$eval('body', (body)=>{
+      return body.classList[0];
+    });
+    expect(classAttribute).toBe('settings');
   });
 
   it('Test10: Clicking the back button, new URL should be /#entry1', async() => {
     // implement test10: Clicking on the back button should update the URL to contain ‘/#entry1’
-
+    await page.goBack();
+    expect(page.url()).toBe('http://127.0.0.1:5500/#entry1');
   });
 
   // define and implement test11: Clicking the back button once should bring the user back to the home page
-
+  it('test11: Clicking the back button once should bring the user back to the home page', async() => {
+    await page.goBack();
+    expect(page.url()).toBe('http://127.0.0.1:5500/');
+  });
 
   // define and implement test12: When the user if on the homepage, the header title should be “Journal Entries”
-
+  it('test12: When the user if on the homepage, the header title should be “Journal Entries”', async () => {
+    const headerTitle = await page.$eval('header > h1', (header) => {
+      return header.innerHTML;
+    });
+    expect(headerTitle).toBe("Journal Entries");
+  });
 
   // define and implement test13: On the home page the <body> element should not have any class attribute 
-
+  it('test13: On the home page the <body> element should not have any class attribute', async () => {
+    const classAttributeLength = await page.$eval('body', (body)=>{
+      return body.classList.length;
+    });
+    expect(classAttributeLength).toBe(0);
+  });
 
   // define and implement test14: Verify the url is correct when clicking on the second entry
-
+  it('test14: Verify the url is correct when clicking on the second entry', async () => {
+    const entries = await page.$$('journal-entry');
+    await entries[1].click();
+    await page.waitForNavigation();
+    const pageUrl = await page.url();
+    expect(pageUrl).toBe('http://127.0.0.1:5500/#entry2');
+  });
 
   // define and implement test15: Verify the title is current when clicking on the second entry
-
+  it('test15: Verify the title is current when clicking on the second entry', async () => {
+    const entry2Header = await page.$eval('header > h1', (header) => {
+      return header.innerHTML;
+    });
+    expect(entry2Header).toBe("Entry 2");
+  });
 
   // define and implement test16: Verify the entry page contents is correct when clicking on the second entry
-
+  it('test16: Verify the entry page contents is correct when clicking on the second entry', async () => {
+     const entrypage = await page.$('entry-page');
+     const entry2 = await entrypage.getProperty('entry');
+     const data = await entry2.jsonValue();
+     expect(data.title).toBe('Run, Forrest! Run!');
+     expect(data.date).toBe('4/26/2021');
+     expect(data.content).toBe("Mama always said life was like a box of chocolates. You never know what you're gonna get.");
+     expect(data.image.src).toBe("https://s.abcnews.com/images/Entertainment/HT_forrest_gump_ml_140219_4x3_992.jpg");
+     expect(data.image.alt).toBe("forrest running");
+  }, 10000);
 
   // create your own test 17
-
+  it('test17: test go back, forward and back', async () => {
+    await page.goBack();
+    await page.goForward();
+    await page.goBack();
+    expect(page.url()).toBe("http://127.0.0.1:5500/");
+  });
+  
   // create your own test 18
+  it('test18: Verify the url is correct when clicking on the fifth entry', async () => {
+    const entries = await page.$$('journal-entry');
+    await entries[4].click();
+    await page.waitForNavigation();
+    const pageUrl = await page.url();
+    expect(pageUrl).toBe('http://127.0.0.1:5500/#entry5');
+
+  });
 
   // create your own test 19
+  it('test19: Verify the title is current when clicking on the fifth entry', async () => {
+    const entry5Header = await page.$eval('header > h1', (header) => {
+      return header.innerHTML;
+    });
+    expect(entry5Header).toBe("Entry 5");
+
+  });
 
   // create your own test 20
+  it('test20: test back then forward', async () => {
+    const entrypage = await page.$('entry-page');
+    const entry5 = await entrypage.getProperty('entry');
+    const data = await entry5.jsonValue();
+    expect(data.title).toBe('We know each other! He’s a friend from work!');
+  });
   
 });
